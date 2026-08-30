@@ -9,8 +9,10 @@ import { ENDPOINTS } from '@/api/api_url';
 function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // 1. Correctly retrieve search params
   const redirectMessage = searchParams.get('message');
-  const redirectTo = searchParams.get('redirectTo') || '/product';
+  const targetPath = searchParams.get('redirectTo') || '/product';
 
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -36,11 +38,13 @@ function AuthForm() {
         const token = response.data?.token;
 
         if (token) {
+          // Store token in cookies and local storage
           Cookies.set('token', token, { expires: 7 });
           localStorage.setItem('token', token);
           
-          // Redirect to requested page (e.g. /product)
-          router.push(redirectTo);
+          // 2. Perform smooth redirect to target path and refresh state
+          router.push(targetPath);
+          router.refresh();
         } else {
           setError('Invalid login response. Missing token.');
         }
